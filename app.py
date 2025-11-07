@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import re  # Import the regular expression module
+import os
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -38,7 +40,7 @@ def retrieve_data(df, pincode):
         if filtered_data.empty:
             return None
         else:
-            return filtered_data[['CustomerPin-code', 'ServingDC', 'State', 'GG-QWIK','GG-Delhivery','GG-Ecom','GG-Shadowfax','GG-Min.','GG-Pref. Carr.',
+            return filtered_data[['CustomerPin-code', 'ServingDC', 'State', 'GG-QWIK','GG-Delhivery','GG-Shadowfax','GG-Bluedart','GG-Min.','GG-Pref. Carr.',
                                   'HD-QWIK','HD-Delhivery','HD-Min.','HD-Pref. Carr.'
                                   
 ]]
@@ -50,13 +52,21 @@ def retrieve_data_csv(df, pincode):
         if filtered_data.empty:
             return None
         else:
-            return filtered_data[['Pincode', 'QWIK GNG.','Del Serv.','ECOM Serv.','Shadowfax Serv.','Qwik HD.','Del HD.','City','State','Zone']]
+            return filtered_data[['Pincode', 'QWIK GNG.','Del Serv.','Shadowfax Serv.','Bluedart Serv','Qwik HD.','Del HD.','City','State','Zone','GNG P1','HD P1']]
     return None
 
 # Route to render HTML template with search form
 @app.route('/')
 def index():
-    return render_template('index.html')
+    
+    last_modified_dt = None
+    if os.path.exists(csv_file_path_3):
+        last_modified_time = os.path.getmtime(csv_file_path_3)
+        last_modified_dt = datetime.fromtimestamp(last_modified_time).strftime('%Y-%m-%d %H:%M:%S')
+    else:
+        last_modified_dt = None  # Or you can set a message like "File not found"
+
+    return render_template('index.html', last_modified_dt=last_modified_dt)
 
 # Route to handle search request and return JSON response
 @app.route('/search', methods=['POST'])

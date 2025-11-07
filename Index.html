@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>Online PIN Code Search</title>
+
+    <!-- CSS Styles -->
+    <style>
+        body {
+            background-color: #FFF9E6;
+            font-family: Arial, sans-serif; /* Default font family */
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .banner {
+            background-color: LightBlue;
+            color: black;
+            font-family: Consolas, monospace;
+            font-size: 40px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            padding: 0px;
+        }
+
+        .banner a {
+            color: black;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .banner a:hover {
+            text-decoration: underline;
+        }
+        /* Sidebar Styles */
+        .sidebar {
+            height: 100%;
+            width: 110px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: LightBlue;
+            padding-top: 20px;
+            border-right: 2px solid #ccc;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            z-index: 1; /* Ensure it is on top */
+ 	    
+        }
+
+        .sidebar a {
+            display: block;
+	    background-color:lightblue;
+            color: black;
+            padding: 8px 12px;
+            text-decoration: None;
+            font-size: 13px;
+            font-weight: bold;
+	    box-shadow: 1px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar a:hover {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        /* CSS for the search container */
+        .search-container {
+            text-align: center; /* Center the search form */
+            margin-top: 20px;
+        }
+
+        /* CSS for the search input and button */
+        .search-container input[type="text"] {
+            padding: 10px;
+            font-size: 12px;
+            border: 1px solid #ccc;
+            border-radius: 24px; /* Rounded corners */
+            width: 60%;
+            max-width: 400px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+
+        .search-container button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 24px;
+            margin-left: -1px; /* Overlap with the input */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+
+        .search-container button img {
+            vertical-align: middle;
+            max-height: 20px;
+        }
+
+        .search-container button:hover {
+            background-color: #0056b3;
+        }
+
+        /* CSS for search results */
+        #searchResults {
+            margin: auto;
+            padding: 30px;
+            text-align: center;
+            max-width: 90%; /* Control the maximum width */
+        }
+
+        #searchResults table {
+            margin: Auto; /* Center the table */
+            border-collapse: collapse;
+        }
+
+        #searchResults th, #searchResults td {
+            padding: 5px;
+            border: 1px solid #ddd;
+        }
+
+        #searchResults th {
+            background-color: #f2f2f2;
+        }
+
+        /* CSS for footer */
+        footer {
+            text-align: right;
+            padding: 10px;
+            background-color: #f1f1f1;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        /* CSS for marquee */
+        marquee {
+    		font-size: 16px;
+    		font-weight: 500;
+    		color: darkblue;
+    		font-family: Calibri, sans-serif;
+   		display: block;
+    		margin: 20px 0;
+    		padding: 10px 0; /* Space above and below marquee */
+    		margin-left: 100px; /* Ensure it starts after the sidebar */
+    		margin-right: 0; /* Remove the default right margin */
+    		width: calc(100% - 100px); /* Adjust width to fit after sidebar */
+    		box-sizing: border-box; /* Include padding in width calculation */
+	}
+
+    </style>
+
+
+
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#searchForm').on('submit', function(e) {
+                e.preventDefault();
+                var pincodes = $('#pincodes').val();
+                $.ajax({
+                    type: 'POST',
+                    url: '/search',
+                    data: { pincodes: pincodes },
+                    success: function(response) {
+                        var results = response.results.join('<br><br>');
+                        $('#searchResults').html(results);
+                    },
+                    error: function(error) {
+                        $('#searchResults').html(error.responseJSON.error);
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+ 
+
+    <div class="banner">
+        <p>Online Pincode Serviceability</p>
+    </div>
+{% if last_modified_dt %}
+  <div style="text-align:center; font-weight:bold; margin-bottom: 15px;">
+    🕒 Serviceability File last Refreshed on: {{ last_modified_dt }}
+  </div>
+{% else %}
+  <div style="text-align:center; color: orange; font-weight:bold; margin-bottom: 15px;">
+    ⚠️ Serviceability file not found at: {{ csv_file_path_3}}
+  </div>
+{% endif %}
+<hr>
+    <div class="search-container">
+
+        <form id="searchForm">
+            <input type="text" id="pincodes" name="pincodes" placeholder="Enter PIN Codes separated by commas or spaces" required>
+            <button type="submit"><img src="https://icones.pro/wp-content/uploads/2021/02/loupe-et-icone-de-recherche-de-couleur-orange.png" alt="Search Icon"> Search</button>
+        </form>
+    </div>
+    <div id="searchResults"></div>
+	
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    <footer>
+        <p>@ Aug-2024 Priyabrata T.</p>
+    </footer>
+
+    <marquee behavior="alternate">Determine if your area is covered by our services by entering your postal code!</marquee>
+    
+</body>
+</html>
